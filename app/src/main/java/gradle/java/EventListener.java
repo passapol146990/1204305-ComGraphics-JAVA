@@ -6,151 +6,86 @@ import static org.lwjgl.opengl.GL11.*;
 public class EventListener {
 
 	public void display() {
-		// 1. ล้างหน้าจอเพียงครั้งเดียว
-		// glClear(GL_COLOR_BUFFER_BIT);
-
-		// // วาด POINTS
-		// glColor3d(1, 0, 0);
-		// glPointSize(5);
-		// glBegin(GL_POINTS);
-		// glVertex2i(50, 50);
-		// glVertex2i(100, 100);
-		// glEnd();
-
-		// // LINES
-		// glClear(GL_COLOR_BUFFER_BIT);
-		// glColor3d(0, 1, 0);
-		// glLineWidth(5);
-		// glBegin(GL_LINES);
-		// glVertex2i(50, 50);
-		// glVertex2i(100, 100);
-		// glEnd();
-
-		// // GL_LINE_STRIP
-		// glClear(GL_COLOR_BUFFER_BIT);
-		// glColor3d(1, 0, 1);
-		// glBegin(GL_LINE_STRIP);
-		// glVertex2d(200, 200);
-		// glVertex2d(250, 400);
-		// glVertex2d(250, 200);
-		// glVertex2d(300, 400);
-		// glEnd();
-		// // Recti 4 เหลี่ยม
-		// glColor3d(0, 0, 1);
-		// glRecti(50, 50, 250, 150);
-
-		// glClear(GL_COLOR_BUFFER_BIT);
-		// glBegin(GL_POLYGON);
-		// glVertex2i(50, 100);
-		// glVertex2i(400, 100);
-		// glVertex2i(400, 400);
-		// glVertex2i(225, 600);
-		// glVertex2i(50,400);
-		// glEnd();
-		// ==================================[ 1 ] ==================================
-		c1();
-		// ==================================[ 2 ] ==================================
-		c2();
-		// ==================================[ 3 ] ==================================
-		c3();
+		main();
+		transalation();
+		scaling();
+		scalingTransition();
 	}
-
-	public void c1(){
-		glPointSize(10);
-		glBegin(GL_POINTS);
-		glVertex2d(50, 500);
-		glVertex2d(100, 525);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex2d(50, 500);
-		glVertex2d(100, 525);
-		glEnd();
-		glBegin(GL_POINTS);
-		glVertex2d(125, 475);
-		glVertex2d(100, 400);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex2d(125, 475);
-		glVertex2d(100, 400);
-		glEnd();
-		glBegin(GL_POINTS);
-		glVertex2d(60, 420);
-		glVertex2d(80, 475);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex2d(60, 420);
-		glVertex2d(80, 475);
-		glEnd();
-	}
-
-	public void c2(){
-		glBegin(GL_LINE_LOOP);
-		glLineWidth(2);
-		glColor3d(1, 1, 0);
-		glVertex2d(50, 50);
-		glVertex2d(50, 150);
-		glVertex2d(100, 200);
-		glVertex2d(150, 150);
-		glVertex2d(150, 50);
-		glEnd();
-		glBegin(GL_LINE_STRIP);
-		glVertex2d(75, 175);
-		glVertex2d(75, 200);
-		glVertex2d(90, 200);
-		glVertex2d(90, 190);
-		glEnd();
-		glBegin(GL_LINE_STRIP);
-		glVertex2d(75, 50);
-		glVertex2d(75, 100);
-		glVertex2d(90, 100);
-		glVertex2d(90, 50);
-		glEnd();
-		glBegin(GL_LINE_LOOP);
-		glVertex2d(110, 100);
-		glVertex2d(110, 125);
-		glVertex2d(140, 125);
-		glVertex2d(140, 100);
-		glEnd();
-	}
-	public void c3(){
-		// glClear(GL_COLOR_BUFFER_BIT);
+	void main(){
 		glColor3d(1, 1, 1);
-		glRecti(100+200, 100, 200+200, 200);
-		glEnd();
+		ddaline(100, 100, 200, 100);
+		ddaline(200, 100, 200, 200);
+		ddaline(100, 100, 200, 200);
+	}
 
-		glBegin(GL_POLYGON);
-		glColor3d(1, 0, 0);
-		glVertex2d(100+200, 200);
-		glVertex2d(150+200, 275);
-		glVertex2d(200+200, 200);
-		glEnd();
-
-		glBegin(GL_POLYGON);
-		glColor3d(0, 1, 0);
-		glVertex2d(200+200, 100);
-		glVertex2d(275+200, 150);
-		glVertex2d(275+200, 250);
-		glVertex2d(200+200, 200);
-		glEnd();
-
-		glBegin(GL_POLYGON);
+	void transalation(){
 		glColor3d(0, 0, 1);
-		glVertex2d(275+200, 250);
-		glVertex2d(225+200, 325);
-		glVertex2d(150+200, 275);
-		glVertex2d(200+200, 200);
+		int tx=100,ty=100;
+		ddaline(tranX(100, tx), tranY(200, ty), tranX(200, tx), tranY(200, ty));
+		ddaline(tranX(200, tx), tranY(200, ty), tranX(200, tx), tranY(300, ty));
+		ddaline(tranX(100, tx), tranY(200, ty), tranX(200, tx), tranY(300, ty));
+	}
+
+	void scaling(){
+		glColor3d(0, 1, 0);
+		int sx=2, sy=3;
+		ddaline(100*sx, 100*sy, 200*sx, 100*sy);
+		ddaline(200*sx, 100*sy, 200*sx, 200*sy);
+		ddaline(100*sx, 100*sy, 200*sx, 200*sy);
+	}
+
+	void scalingTransition(){
+		glColor3d(1, 0, 0);
+		int sx=2, sy=3;
+		int nx=100*sx, ny=100*sy;
+		int tx=100-nx, ty=100-ny;
+		ddaline(calScalingTran(100,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(100,sy,ty));
+		ddaline(calScalingTran(200,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(200,sy,ty));
+		ddaline(calScalingTran(100,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(200,sy,ty));
+	}
+
+	int calScalingTran(int x,int sxsy, int txty){
+		return x*sxsy+txty;
+	}
+
+	int tranX(int x,int tx){
+		return x+tx;
+	}
+	int tranY(int y,int ty){
+		return y+ty;
+	}
+
+	public void ddaline(double x1,double y1,double x2,double y2) {
+		double dx,dy,step,xc,yc,x,y;
+		dx=x2-x1;
+		dy=y2-y1;
+		if(Math.abs(dx)>Math.abs(dy)) step=dx;
+		else step=dy;
+		
+		xc=(dx/step);
+		yc=(dy/step);
+		
+		x=x1;
+		y=y1;
+		
+		glBegin(GL_POINTS);
+		glVertex2i((int)x, (int)y);
 		glEnd();
+		for(int k=1;k<=step;k++) {
+			x=x+xc;
+			y=y+yc;
+			glBegin(GL_POINTS);
+			glVertex2i((int)x, (int)y);
+			glEnd();
+		}
+		
 	}
 
 	public void dispose() {
-		// Cleanup code
 		System.out.println("Cleaning up...");
 	}
 
-	public void init() {
-		// Set clear color (background)
-		// glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
-	}
+	public void init() {}
 
 	public void reshape(int x, int y, int width, int height) {
 		glMatrixMode(GL_PROJECTION);
