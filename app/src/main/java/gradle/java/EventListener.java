@@ -7,9 +7,10 @@ public class EventListener {
 
 	public void display() {
 		main();
-		transalation();
-		scaling();
-		scalingTransition();
+		// transalation();
+		// scaling();
+		// scalingTransition();
+		rotation();
 	}
 	void main(){
 		glColor3d(1, 1, 1);
@@ -17,6 +18,43 @@ public class EventListener {
 		ddaline(200, 100, 200, 200);
 		ddaline(100, 100, 200, 200);
 	}
+
+	void rotation() {
+		glColor3d(1, 1, 1);
+		double angle = Math.toRadians(30);
+		int px = 100;
+		int py = 100;
+		ddaline(
+			rotX(100, 100, px, py, angle), rotY(100, 100, px, py, angle),
+			rotX(200, 100, px, py, angle), rotY(200, 100, px, py, angle)
+		);
+
+		ddaline(
+			rotX(200, 100, px, py, angle), rotY(200, 100, px, py, angle),
+			rotX(200, 200, px, py, angle), rotY(200, 200, px, py, angle)
+		);
+
+		ddaline(
+			rotX(100, 100, px, py, angle), rotY(100, 100, px, py, angle),
+			rotX(200, 200, px, py, angle), rotY(200, 200, px, py, angle)
+		);
+	}
+
+	int rotX(int x, int y, int px, int py, double ang) {
+		x -= px;
+		y -= py;
+		int xr = (int)(x * Math.cos(ang) + y * Math.sin(ang));
+		return xr + px;
+	}
+
+	int rotY(int x, int y, int px, int py, double ang) {
+		x -= px;
+		y -= py;
+		int yr = (int)(-x * Math.sin(ang) + y * Math.cos(ang));
+		return yr + py;
+	}
+
+
 
 	void transalation(){
 		glColor3d(0, 0, 1);
