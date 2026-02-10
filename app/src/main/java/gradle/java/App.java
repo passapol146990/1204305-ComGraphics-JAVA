@@ -3,19 +3,16 @@ package gradle.java;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
-
-import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class App {
     
     private long window;
+    private EventListener listener = new EventListener();
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -46,30 +43,47 @@ public class App {
                 glfwSetWindowShouldClose(window, true);
         });
 
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
-
-            glfwGetWindowSize(window, pWidth, pHeight);
-
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-            glfwSetWindowPos(
-                window,
-                (vidmode.width() - pWidth.get(0)) / 2,
-                (vidmode.height() - pHeight.get(0)) / 2
-            );
-        }
-
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
         glfwShowWindow(window);
+
+        glfwSetMouseButtonCallback(window, (w, button, action, mods) -> {
+            if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+                double[] xpos = new double[1];
+                double[] ypos = new double[1];
+                glfwGetCursorPos(window, xpos, ypos);
+
+                listener.handleMouseClick(
+                    xpos[0],
+                    600 - ypos[0]
+                );
+            }
+        });
+        glfwSetMouseButtonCallback(window, (w, button, action, mods) -> {
+            if (action == GLFW_PRESS) {
+
+                double[] xpos = new double[1];
+                double[] ypos = new double[1];
+                glfwGetCursorPos(window, xpos, ypos);
+
+                double x = xpos[0];
+                double y = 600 - ypos[0]; // กลับแกน Y
+
+                if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                    listener.handleMouseClick(x, y);
+                }
+
+                if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+                    listener.removeLastLine(); // คลิกขวา
+                }
+            }
+        });
+
     }
 
     private void loop() {
         GL.createCapabilities();
 
-        EventListener listener = new EventListener();
         listener.init();
         listener.reshape(0, 0, 800, 600);
 

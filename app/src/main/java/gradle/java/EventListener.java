@@ -1,135 +1,102 @@
-
 package gradle.java;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.util.ArrayList;
+
 public class EventListener {
 
-	public void display() {
-		main();
-		// transalation();
-		// scaling();
-		// scalingTransition();
-		rotation();
-	}
-	void main(){
-		glColor3d(1, 1, 1);
-		ddaline(100, 100, 200, 100);
-		ddaline(200, 100, 200, 200);
-		ddaline(100, 100, 200, 200);
-	}
+    double x1, y1;
+    boolean firstPoint = true;
 
-	void rotation() {
-		glColor3d(1, 1, 1);
-		double angle = Math.toRadians(30);
-		int px = 100;
-		int py = 100;
-		ddaline(
-			rotX(100, 100, px, py, angle), rotY(100, 100, px, py, angle),
-			rotX(200, 100, px, py, angle), rotY(200, 100, px, py, angle)
-		);
+    ArrayList<Line> lines = new ArrayList<>();
 
-		ddaline(
-			rotX(200, 100, px, py, angle), rotY(200, 100, px, py, angle),
-			rotX(200, 200, px, py, angle), rotY(200, 200, px, py, angle)
-		);
-
-		ddaline(
-			rotX(100, 100, px, py, angle), rotY(100, 100, px, py, angle),
-			rotX(200, 200, px, py, angle), rotY(200, 200, px, py, angle)
-		);
-	}
-
-	int rotX(int x, int y, int px, int py, double ang) {
-		x -= px;
-		y -= py;
-		int xr = (int)(x * Math.cos(ang) + y * Math.sin(ang));
-		return xr + px;
-	}
-
-	int rotY(int x, int y, int px, int py, double ang) {
-		x -= px;
-		y -= py;
-		int yr = (int)(-x * Math.sin(ang) + y * Math.cos(ang));
-		return yr + py;
-	}
-
-
-
-	void transalation(){
-		glColor3d(0, 0, 1);
-		int tx=100,ty=100;
-		ddaline(tranX(100, tx), tranY(200, ty), tranX(200, tx), tranY(200, ty));
-		ddaline(tranX(200, tx), tranY(200, ty), tranX(200, tx), tranY(300, ty));
-		ddaline(tranX(100, tx), tranY(200, ty), tranX(200, tx), tranY(300, ty));
-	}
-
-	void scaling(){
-		glColor3d(0, 1, 0);
-		int sx=2, sy=3;
-		ddaline(100*sx, 100*sy, 200*sx, 100*sy);
-		ddaline(200*sx, 100*sy, 200*sx, 200*sy);
-		ddaline(100*sx, 100*sy, 200*sx, 200*sy);
-	}
-
-	void scalingTransition(){
-		glColor3d(1, 0, 0);
-		int sx=2, sy=3;
-		int nx=100*sx, ny=100*sy;
-		int tx=100-nx, ty=100-ny;
-		ddaline(calScalingTran(100,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(100,sy,ty));
-		ddaline(calScalingTran(200,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(200,sy,ty));
-		ddaline(calScalingTran(100,sx,tx), calScalingTran(100,sy,ty), calScalingTran(200,sx,tx), calScalingTran(200,sy,ty));
-	}
-
-	int calScalingTran(int x,int sxsy, int txty){
-		return x*sxsy+txty;
-	}
-
-	int tranX(int x,int tx){
-		return x+tx;
-	}
-	int tranY(int y,int ty){
-		return y+ty;
-	}
-
-	public void ddaline(double x1,double y1,double x2,double y2) {
-		double dx,dy,step,xc,yc,x,y;
-		dx=x2-x1;
-		dy=y2-y1;
-		if(Math.abs(dx)>Math.abs(dy)) step=dx;
-		else step=dy;
-		
-		xc=(dx/step);
-		yc=(dy/step);
-		
-		x=x1;
-		y=y1;
-		
-		glBegin(GL_POINTS);
-		glVertex2i((int)x, (int)y);
-		glEnd();
-		for(int k=1;k<=step;k++) {
-			x=x+xc;
-			y=y+yc;
-			glBegin(GL_POINTS);
-			glVertex2i((int)x, (int)y);
-			glEnd();
+    public void handleMouseClick(double x, double y) {
+		if (firstPoint) {
+			x1 = x;
+			y1 = y;
+			firstPoint = false;
+			System.out.println("Point 1: " + x1 + ", " + y1);
+		} else {
+			lines.add(new Line(x1, y1, x, y));
+			firstPoint = true;
+			System.out.println("Point 2: " + x + ", " + y);
 		}
-		
 	}
 
-	public void dispose() {
-		System.out.println("Cleaning up...");
+	public void removeLastLine() {
+		if (!lines.isEmpty()) {
+			lines.remove(lines.size() - 1);
+			System.out.println("Remove last line");
+		}
 	}
 
-	public void init() {}
 
-	public void reshape(int x, int y, int width, int height) {
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
 
-		glOrtho(0, 640, 0, 640, 0, 1);
-		glMatrixMode(GL_MODELVIEW);
+    public void display() {
+		glColor3d(1, 1, 1);
+
+		for (Line line : lines) {
+			ddaline(line.x1, line.y1, line.x2, line.y2);
+		}
+
+		// แสดงจุดแรก (optional)
+		if (!firstPoint) {
+			drawPoint(x1, y1);
+		}
 	}
+
+
+    void drawPoint(double x, double y) {
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glVertex2i((int) x, (int) y);
+        glEnd();
+    }
+
+    public void ddaline(double x1, double y1, double x2, double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        double step = Math.max(Math.abs(dx), Math.abs(dy));
+        double xc = dx / step;
+        double yc = dy / step;
+
+        double x = x1;
+        double y = y1;
+
+        glBegin(GL_POINTS);
+        for (int i = 0; i <= step; i++) {
+            glVertex2i((int) x, (int) y);
+            x += xc;
+            y += yc;
+        }
+        glEnd();
+    }
+
+    public void init() {
+        glClearColor(0, 0, 0, 1);
+    }
+
+    public void reshape(int x, int y, int width, int height) {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width, 0, height, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+    }
+
+    public void dispose() {
+        System.out.println("Cleaning up...");
+    }
+}
+
+
+class Line {
+    double x1, y1, x2, y2;
+
+    public Line(double x1, double y1, double x2, double y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+    }
 }
