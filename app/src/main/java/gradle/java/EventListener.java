@@ -10,42 +10,138 @@ public class EventListener {
     boolean firstPoint = true;
 
     ArrayList<Line> lines = new ArrayList<>();
+    ArrayList<Point> polygonPoints = new ArrayList<>();
+    boolean isClosed = false;
+    Point t1 = new Point(200, 200);
+    Point t2 = new Point(400, 200);
+    Point t3 = new Point(300, 400);
+
+    boolean isFilled = false;
+
+    class Point {
+        int x, y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     public void handleMouseClick(double x, double y) {
-		if (firstPoint) {
-			x1 = x;
-			y1 = y;
-			firstPoint = false;
-			System.out.println("Point 1: " + x1 + ", " + y1);
-		} else {
-			lines.add(new Line(x1, y1, x, y));
-			firstPoint = true;
-			System.out.println("Point 2: " + x + ", " + y);
-		}
-	}
 
-	public void removeLastLine() {
-		if (!lines.isEmpty()) {
-			lines.remove(lines.size() - 1);
-			System.out.println("Remove last line");
-		}
-	}
+        if (isInsideTriangle((int) x, (int) y)) {
+            isFilled = true;
+            System.out.println("Fill triangle!");
+        }
+    }
 
+    void fillTriangle() {
 
+        glColor3d(1, 0, 0);
+
+        Point[] pts = { t1, t2, t3 };
+
+        for (int i = 0; i < 3 - 1; i++) {
+            for (int j = i + 1; j < 3; j++) {
+                if (pts[i].y > pts[j].y) {
+                    Point temp = pts[i];
+                    pts[i] = pts[j];
+                    pts[j] = temp;
+                }
+            }
+        }
+
+        Point p0 = pts[0];
+        Point p1 = pts[1];
+        Point p2 = pts[2];
+
+        double invSlope1 = 0;
+        double invSlope2 = 0;
+
+        if (p1.y - p0.y != 0) {
+
+            invSlope1 = (double) (p1.x - p0.x) / (p1.y - p0.y);
+            invSlope2 = (double) (p2.x - p0.x) / (p2.y - p0.y);
+
+            double curx1 = p0.x;
+            double curx2 = p0.x;
+
+            for (int y = p0.y; y <= p1.y; y++) {
+
+                int startX = (int) Math.min(curx1, curx2);
+                int endX = (int) Math.max(curx1, curx2);
+
+                glBegin(GL_POINTS);
+                for (int x = startX; x <= endX; x++) {
+                    glVertex2i(x, y);
+                }
+                glEnd();
+
+                curx1 += invSlope1;
+                curx2 += invSlope2;
+            }
+
+        }
+
+        if (p2.y - p1.y != 0) {
+
+            invSlope1 = (double) (p2.x - p1.x) / (p2.y - p1.y);
+            invSlope2 = (double) (p2.x - p0.x) / (p2.y - p0.y);
+
+            double curx1 = p1.x;
+            double curx2 = p0.x + (p1.y - p0.y) *
+                    (double) (p2.x - p0.x) / (p2.y - p0.y);
+
+            for (int y = p1.y; y <= p2.y; y++) {
+
+                int startX = (int) Math.min(curx1, curx2);
+                int endX = (int) Math.max(curx1, curx2);
+
+                glBegin(GL_POINTS);
+                for (int x = startX; x <= endX; x++) {
+                    glVertex2i(x, y);
+                }
+                glEnd();
+
+                curx1 += invSlope1;
+                curx2 += invSlope2;
+            }
+        }
+    }
+
+    public void removeLastLine() {
+        if (!lines.isEmpty()) {
+            lines.remove(lines.size() - 1);
+            System.out.println("Remove last line");
+        }
+    }
 
     public void display() {
-		glColor3d(1, 1, 1);
 
-		for (Line line : lines) {
-			ddaline(line.x1, line.y1, line.x2, line.y2);
-		}
+        glClear(GL_COLOR_BUFFER_BIT);
 
-		// แสดงจุดแรก (optional)
-		if (!firstPoint) {
-			drawPoint(x1, y1);
-		}
-	}
+        if (isFilled) {
+            fillTriangle();
+        }
 
+        glColor3d(1, 1, 1);
+        ddaline(t1.x, t1.y, t2.x, t2.y);
+        ddaline(t2.x, t2.y, t3.x, t3.y);
+        ddaline(t3.x, t3.y, t1.x, t1.y);
+    }
+
+    boolean isInsideTriangle(int x, int y) {
+
+        double denominator = ((t2.y - t3.y) * (t1.x - t3.x) + (t3.x - t2.x) * (t1.y - t3.y));
+
+        double a = ((t2.y - t3.y) * (x - t3.x) + (t3.x - t2.x) * (y - t3.y)) / denominator;
+
+        double b = ((t3.y - t1.y) * (x - t3.x) + (t1.x - t3.x) * (y - t3.y)) / denominator;
+
+        double c = 1 - a - b;
+
+        return a >= 0 && b >= 0 && c >= 0;
+    }
 
     void drawPoint(double x, double y) {
         glPointSize(5);
@@ -88,7 +184,6 @@ public class EventListener {
         System.out.println("Cleaning up...");
     }
 }
-
 
 class Line {
     double x1, y1, x2, y2;
