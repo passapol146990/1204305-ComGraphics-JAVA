@@ -1,6 +1,5 @@
 package gradle.java;
 
-import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
@@ -15,8 +14,6 @@ public class App {
     private EventListener listener = new EventListener();
 
     public void run() {
-        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
         init();
         loop();
         glfwFreeCallbacks(window);
@@ -67,14 +64,14 @@ public class App {
                 glfwGetCursorPos(window, xpos, ypos);
 
                 double x = xpos[0];
-                double y = 600 - ypos[0]; // กลับแกน Y
+                double y = 600 - ypos[0];
 
                 if (button == GLFW_MOUSE_BUTTON_LEFT) {
                     listener.handleMouseClick(x, y);
                 }
 
                 if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-                    listener.removeLastLine(); // คลิกขวา
+                    listener.removeLastLine();
                 }
             }
         });
